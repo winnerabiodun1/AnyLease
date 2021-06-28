@@ -11,4 +11,4 @@ class SignUpView (generic.CreateView):
     template_name = 'registration/signup.html'
 
 def index (request):
-    return HttpResponse ('Hello world')
+    return HttpResponse ('Welcome to AnyLease Equipment Service')
