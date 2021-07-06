@@ -35,3 +35,42 @@ class LogInView (KnoxLoginView):
         login(request, user) 
         return super(LogInView, self).post(request, format=None)
     
+
+from rest_framework import status
+from rest_framework import generics
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from .serializers import changePasswordSerializer
+from rest_framework.permissions import IsAuthenticated
+
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = changePasswordSerializer
+    
+    model = User
+    permission_classes = (IsAuthenticated,)
+    
+    def get_object(self, queryset=None):
+        query = self.request.user 
+        return query
+    
+    def update(self,request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        
+        if serializer.is_valid():
+            
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password" : ["wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                "status" : "Success",
+                "code" : status.HTTP_200_OK,
+                "message" : "Password Has Been Successfully Updated",
+                "data" : []
+            }
+            
+            return Response(response)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
