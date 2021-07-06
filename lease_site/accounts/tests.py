@@ -1,3 +1,6 @@
 from django.test import TestCase
+from rest_framework.test import APITestCase
 
-# Create your tests here.
+from rest_framework import status
+
+# Create your tests here
